@@ -1,0 +1,67 @@
+# score-generator
+
+A Clojure library designed to build a simple DSL to generate MusicXML. This is
+just a quick and dirty way to take lead sheets I have, turn them into MusicXML,
+and import them into Guitar Pro 7 for final cleanup.
+
+This code is currently in the =rush it out and see if it works= stage. There are
+some tests but there are also some choices I made that I wouldn't have
+ordinarily.
+
+It may or may not be worth cleaning up depending on how my explorations with Lilypond go...
+
+## Usage
+
+Currently loading up a repl and calling ~(generate-musicxml infile outfile)~ produces
+an outfile in MusicXML.
+
+If for some reason someone is nuts enough to look at this as is, start with generate-musicxml and this parser definition:
+
+#+begin_src clojure
+(def simple-score
+  (insta/parser
+   " key    = <'Key: '> step [acc]
+    acc    = 'b' | '#'
+    <timesig> = <'Time Signature: '> beats <'/'> type
+    beats   = bnum
+    type    = tnum
+    <bnum>  = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+    <tnum>  = '1'|'2'|'4'|'8'
+    measure    = notes
+    <notes>      = note | (note <' '> notes)
+    space      = <' '>
+    note       = pitch <'/'> duration | rest
+    rest       = <'r'> duration
+    pitch      = step octave [<','>alter]
+    duration   = ('1' | '2' | '4' | '8' | '12' | '16') [dotted]
+    dotted     = <'.'>
+    alter      = ('+'|'-')('1'|'2')
+    step       = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
+    octave     = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'"))
+#+end_src
+
+In order to accelerate things I use instaparse's ability to provide a start rule and enforced a string file structure:
+
+#+begin_src bash
+<song title>
+Key: <song key>
+Time Signature: <beats>/<beat-type>
+measures
+#+end_src
+
+The measures section is one measure per line. There is an example file in resources.
+
+## License
+
+Copyright © 2020 Jeremy German
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License 2.0 which is available at
+http://www.eclipse.org/legal/epl-2.0.
+
+This Source Code may also be made available under the following Secondary
+Licenses when the conditions for such availability set forth in the Eclipse
+Public License, v. 2.0 are satisfied: GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or (at your
+option) any later version, with the GNU Classpath Exception which is available
+at https://www.gnu.org/software/classpath/license.html.
